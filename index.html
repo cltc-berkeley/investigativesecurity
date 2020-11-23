@@ -3,12 +3,9 @@
 <style>
 
 .node {
-  font: 500 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  fill: #bbb;
-}
-
-.node:hover {
-  fill: #000;
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #000000;
+  opacity: 0;
 }
 
 .link {
@@ -21,15 +18,24 @@
 .node:hover,
 .node--source,
 .node--target {
-  font-weight: 700;
+  font: 15px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  opacity: 1;
 }
 
 .node--source {
-  fill: #2ca02c;
+  fill: #000000FF;
+  opacity: 1;
 }
 
 .node--target {
-  fill: #d62728;
+  fill: #000000FF;
+  opacity: 1;
+}
+
+.node--high {
+  fill: #3300CCFF;
+  opacity: 1;
 }
 
 .link--source,
@@ -46,13 +52,14 @@
   stroke: #2ca02c;
 }
 
+
 </style>
 <body>
 <script  type="text/javascript" src="js/d3.v4.min.js"></script>
 <script>
 
-var diameter = 4000,
-    radius = diameter / 8,
+var diameter = 8000,
+    radius = diameter / 16,
     innerRadius = radius - 300;
 
 var cluster = d3.cluster()
@@ -91,13 +98,15 @@ d3.json("link_map.json", function(error, classes) {
     .data(root.leaves())
     .enter().append("text")
       .attr("class", "node")
+      .classed("node--high", function(n) { return (n.data.imports.length > 0); })
       .attr("dy", "0.31em")
       .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
       .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-      .text(function(d) { return d.data.key; })
+      .text(function(d) { return (d.data.imports.length < 0 ? "" : d.data.key); })
       .on("mouseover", mouseovered)
       .on("mouseout", mouseouted);
 });
+
 
 function mouseovered(d) {
   node
@@ -110,8 +119,12 @@ function mouseovered(d) {
       .raise();
 
   node
-      .classed("node--target", function(n) { return n.target; })
-      .classed("node--source", function(n) { return n.source; });
+      .classed("node--target", function(n) { 
+        return n.target; })
+      .classed("node--source", function(n) { 
+        return n.source; })
+      .classed("node--high", function(n) { return (n.data.imports.length > 0); });
+      
 }
 
 function mouseouted(d) {
@@ -121,7 +134,8 @@ function mouseouted(d) {
 
   node
       .classed("node--target", false)
-      .classed("node--source", false);
+      .classed("node--source", false)
+      .classed("node--high", function(n) { return (n.data.imports.length > 0); });
 }
 
 // Lazily construct the package hierarchy from class names.
@@ -161,7 +175,7 @@ function packageImports(nodes) {
 
   // For each import, construct a link from the source to target node.
   nodes.forEach(function(d) {
-    if (d.data.imports) d.data.imports.forEach(function(i) {
+    if (d.data.imports.length >= 0) d.data.imports.forEach(function(i) {
       imports.push(map[d.data.name].path(map[i]));
     });
   });
