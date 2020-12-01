@@ -45,7 +45,7 @@
 }
 
 .link--source {
-  stroke: #d62728;
+  stroke: #2728d6;
 }
 
 .link--target {
@@ -176,7 +176,7 @@ function packageImports(nodes) {
 
   // Compute a map from name to node.
   nodes.forEach(function(d) {
-    console.log("Z"+d.data.name);
+    //console.log("Z"+d.data.name);
     map[d.data.name] = d;
   });
 
@@ -189,6 +189,8 @@ function packageImports(nodes) {
 
   return imports;
 }
+
+window.self.scrollTo(window.self.outerWidth/3, window.self.outerHeight/3);
 
 </script>
 </body>
